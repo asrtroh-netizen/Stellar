@@ -48,8 +48,10 @@ class AdbPairingService : Service() {
         private const val stopAction = "stop"
         private const val stopAndRetryAction = "stop_and_retry"
         private const val replyAction = "reply"
+        private const val launchAction = "launch"
         private const val remoteInputResultKey = "paring_code"
         private const val portKey = "paring_code"
+        private const val launchRequestId = 5
 
         @Volatile
         private var isRunning = false
@@ -65,6 +67,9 @@ class AdbPairingService : Service() {
 
         private fun replyIntent(context: Context, port: Int): Intent =
             Intent(context, AdbPairingService::class.java).setAction(replyAction).putExtra(portKey, port)
+
+        private fun launchIntent(context: Context): Intent =
+            Intent(context, AdbPairingService::class.java).setAction(launchAction)
     }
 
     private var adbMdns: AdbMdns? = null
@@ -145,6 +150,9 @@ class AdbPairingService : Service() {
                 } else {
                     onStart()
                 }
+            }
+            launchAction -> {
+                onLaunchFromNotification()
             }
             stopAction -> {
                 onStopSearch()
@@ -285,6 +293,7 @@ class AdbPairingService : Service() {
                     .setSmallIcon(R.drawable.ic_stellar)
                     .setContentTitle(getString(R.string.pairing_success))
                     .setContentText(getString(R.string.searching_connect_service))
+                    .addAction(launchNotificationAction)
                     .setOngoing(true)
                     .build()
 
@@ -554,6 +563,33 @@ class AdbPairingService : Service() {
         )
 
         return action
+    }
+
+    private val launchNotificationAction by lazy {
+        val pendingIntent = PendingIntent.getForegroundService(
+            this,
+            launchRequestId,
+            launchIntent(this),
+            if (atLeast31)
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            else
+                PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        Notification.Action.Builder(
+            null,
+            getString(R.string.notification_start_service),
+            pendingIntent
+        ).build()
+    }
+
+    private fun onLaunchFromNotification(): Notification {
+        val port = roro.stellar.manager.util.EnvironmentUtils.getAdbTcpPort()
+        if (port in 1..65535) {
+            roro.stellar.manager.startup.worker.AdbStartWorker.enqueue(this)
+        } else {
+            searchConnectService()
+        }
+        return workingNotification
     }
 
     private val searchingNotification by lazy {

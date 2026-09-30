@@ -102,6 +102,7 @@ import roro.stellar.manager.StellarSettings.SHIZUKU_COMPAT_ENABLED
 import roro.stellar.manager.StellarSettings.TCPIP_PORT
 import roro.stellar.manager.StellarSettings.TCPIP_PORT_ENABLED
 import roro.stellar.manager.StellarSettings.WIRELESS_DEBUGGING_SU
+import roro.stellar.manager.watchdog.AdbWatchdogService
 import roro.stellar.manager.compat.ClipboardUtils
 import roro.stellar.manager.db.AppDatabase
 import roro.stellar.manager.db.ConfigEntity
@@ -221,6 +222,10 @@ fun SettingsScreen(
 
     var daemonEnabled by remember {
         mutableStateOf(preferences.getBoolean(StellarSettings.DAEMON_ENABLED, false))
+    }
+
+    var watchdogAdb by remember {
+        mutableStateOf(preferences.getBoolean(StellarSettings.WATCHDOG_ENABLED_ADB, false))
     }
 
     var hideBackground by remember {
@@ -554,6 +559,20 @@ fun SettingsScreen(
                             } catch (_: Exception) {
                             }
                         }
+                    }
+                )
+            }
+
+            item {
+                SettingsSwitchCard(
+                    icon = Icons.Default.Security,
+                    title = stringResource(R.string.watchdog_adb),
+                    subtitle = stringResource(R.string.watchdog_adb_subtitle),
+                    checked = watchdogAdb,
+                    onCheckedChange = { newValue ->
+                        watchdogAdb = newValue
+                        savePreference(StellarSettings.WATCHDOG_ENABLED_ADB, newValue)
+                        AdbWatchdogService.sync(context)
                     }
                 )
             }

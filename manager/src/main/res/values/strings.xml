@@ -150,6 +150,11 @@
     <string name="wireless_debugging_su_subtitle">Try to start the service with su over wireless debugging</string>
     <string name="daemon_enabled">Process Daemon</string>
     <string name="daemon_enabled_subtitle">Mutual process monitoring for auto-restart</string>
+    <string name="watchdog_adb">ADB Watchdog</string>
+    <string name="watchdog_adb_subtitle">Restart the service automatically if an ADB-started session dies</string>
+    <string name="notification_channel_watchdog">Watchdog</string>
+    <string name="notification_watchdog_title">Stellar watchdog is active</string>
+    <string name="notification_watchdog_content">The ADB-started service will be restarted if it dies</string>
     <string name="add_to_home_screen">Add to Home</string>
     <string name="add_to_home_screen_and_save">Add to Home and Save</string>
     <string name="shortcut_not_supported">The current launcher does not support pinned shortcuts</string>
@@ -326,6 +331,7 @@
     <string name="please_wait_auto_return">Please wait, returning to input screen</string>
     <string name="connect_service_not_found">Connection service not found</string>
     <string name="please_open_app_manually">Please open the app to start the service</string>
+    <string name="notification_start_service">Start now</string>
     <string name="stop_search">Stop Search</string>
     <string name="cannot_find_pairing">Can\'t find pairing</string>
     <string name="pairing_code">Pairing code</string>

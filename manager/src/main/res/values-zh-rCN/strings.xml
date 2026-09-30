@@ -149,6 +149,11 @@
     <string name="wireless_debugging_su_subtitle">尝试通过无线调试使用 su 提权启动服务</string>
     <string name="daemon_enabled">进程守护</string>
     <string name="daemon_enabled_subtitle">双进程互守，自动重启</string>
+    <string name="watchdog_adb">ADB 守护</string>
+    <string name="watchdog_adb_subtitle">ADB 启动的服务断开后自动重新拉起</string>
+    <string name="notification_channel_watchdog">守护状态</string>
+    <string name="notification_watchdog_title">Stellar 守护已启用</string>
+    <string name="notification_watchdog_content">ADB 启动的服务被关闭后会自动尝试重新启动</string>
     <string name="add_to_home_screen">添加到桌面</string>
     <string name="add_to_home_screen_and_save">添加到桌面并保存</string>
     <string name="shortcut_not_supported">当前桌面不支持固定快捷方式</string>
@@ -325,6 +330,7 @@
     <string name="please_wait_auto_return">请稍候，将自动返回输入界面</string>
     <string name="connect_service_not_found">未找到连接服务</string>
     <string name="please_open_app_manually">请手动打开应用启动服务</string>
+    <string name="notification_start_service">立即启动</string>
     <string name="stop_search">停止搜索</string>
     <string name="cannot_find_pairing">搜索不到配对</string>
     <string name="pairing_code">配对码</string>

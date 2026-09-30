@@ -2,7 +2,7 @@ subprojects {
     plugins.withId("com.android.base") {
         android {
             compileSdk = 37
-            ndkVersion = "29.0.13113456"
+            ndkVersion = System.getenv("STELLAR_NDK_VERSION") ?: "29.0.13113456"
             
             defaultConfig {
                 minSdk = 24

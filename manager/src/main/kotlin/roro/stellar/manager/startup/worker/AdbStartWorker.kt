@@ -165,6 +165,7 @@ class AdbStartWorker(
             if (AdbStarter.waitForBinder()) {
                 Log.i(TAG, "Stellar 服务已通过 ADB 在开机时成功启动")
                 StellarSettings.setLastLaunchMethod(StellarSettings.LaunchMethod.ADB)
+                roro.stellar.manager.watchdog.AdbWatchdogService.sync(applicationContext)
                 Settings.Global.putInt(cr, "adb_wifi_enabled", 0)
                 BootStartNotifications.dismiss(applicationContext)
                 return Result.success()

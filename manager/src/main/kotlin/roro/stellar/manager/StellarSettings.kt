@@ -20,6 +20,7 @@ object StellarSettings {
     const val ACCESSIBILITY_AUTO_START_PROMPTED = "accessibility_auto_start_prompted"
     const val LAST_VERSION_CODE = "last_version_code"
     const val DAEMON_ENABLED = "daemon_enabled"
+    const val WATCHDOG_ENABLED_ADB = "watchdog_enabled_adb"
     const val HIDE_BACKGROUND = "hide_background"
 
     enum class BootMode { NONE, BROADCAST, TCPIP_PREWARM, SCRIPT }
