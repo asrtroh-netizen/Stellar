@@ -29,6 +29,8 @@ import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.NavHost
@@ -336,24 +338,30 @@ private fun MainScreenContent(
 
     CompositionLocalProvider(LocalNavigationState provides navigationState) {
         AdaptiveLayoutProvider {
-            if (isLandscape) {
-                Row(modifier = Modifier
+            val scheme = MaterialTheme.colorScheme
+            val shell = Brush.verticalGradient(
+                listOf(
+                    scheme.surfaceContainerLow,
+                    scheme.surface,
+                    scheme.surfaceContainer,
+                )
+            )
+            Box(
+                modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    StandardNavigationRail(
-                        selectedIndex = selectedIndex,
-                        onItemClick = onNavigationItemClick
-                    )
-                    navHostContent(Modifier
-                        .weight(1f)
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface)
-                    )
-                }
-            } else {
-                Box(modifier = Modifier.fillMaxSize()) {
+                    .background(shell)
+            ) {
+                if (isLandscape) {
+                    Row(modifier = Modifier.fillMaxSize()) {
+                        StandardNavigationRail(
+                            selectedIndex = selectedIndex,
+                            onItemClick = onNavigationItemClick
+                        )
+                        navHostContent(Modifier.weight(1f).fillMaxSize())
+                    }
+                } else {
                     Scaffold(
+                        containerColor = Color.Transparent,
                         bottomBar = {
                             StandardBottomNavigation(
                                 selectedIndex = selectedIndex,

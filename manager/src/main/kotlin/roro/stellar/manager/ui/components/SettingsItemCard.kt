@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import roro.stellar.manager.ui.theme.AppShape
 import roro.stellar.manager.ui.theme.AppSpacing
+import roro.stellar.manager.ui.theme.glassPanel
 
 @Composable
 fun SettingsSwitchCard(
@@ -53,7 +54,7 @@ fun SettingsSwitchCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         ),
         shape = AppShape.shapes.cardMedium
     ) {
@@ -115,7 +116,7 @@ fun SettingsClickableCard(
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         ),
         shape = AppShape.shapes.cardMedium
     ) {
@@ -207,7 +208,7 @@ fun SettingsExpandableCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         ),
         shape = AppShape.shapes.cardMedium
     ) {

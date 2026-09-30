@@ -58,6 +58,7 @@ import roro.stellar.manager.R
 import roro.stellar.manager.model.FeatureAvailability
 import roro.stellar.manager.model.RestrictedFeature
 import roro.stellar.manager.ui.theme.AppShape
+import roro.stellar.manager.ui.theme.glassPanel
 
 @Composable
 private fun ModernStatusCard(
@@ -90,7 +91,7 @@ private fun ModernStatusCard(
                 )
             ),
         shape = AppShape.shapes.cardLarge,
-        colors = CardDefaults.cardColors(containerColor = backgroundColor)
+        colors = CardDefaults.cardColors(containerColor = backgroundColor.glassPanel)
     ) {
         Column(
             modifier = Modifier
@@ -257,7 +258,7 @@ fun AdbRestrictedHintCard(
         modifier = Modifier.fillMaxWidth(),
         shape = AppShape.shapes.cardLarge,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
+            containerColor = MaterialTheme.colorScheme.errorContainer.glassPanel
         )
     ) {
         Row(
@@ -458,7 +459,7 @@ fun StartRootCard(
         modifier = Modifier.fillMaxWidth(),
         shape = AppShape.shapes.cardLarge,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         )
     ) {
         Row(
@@ -518,7 +519,7 @@ fun StartWirelessAdbCard(
         modifier = Modifier.fillMaxWidth(),
         shape = AppShape.shapes.cardLarge,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         )
     ) {
         Row(
@@ -578,7 +579,7 @@ fun StartWiredAdbCard(
         modifier = Modifier.fillMaxWidth(),
         shape = AppShape.shapes.cardLarge,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow.glassPanel
         )
     ) {
         Row(
