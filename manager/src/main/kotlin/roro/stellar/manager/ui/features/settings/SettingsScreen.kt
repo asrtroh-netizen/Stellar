@@ -130,7 +130,6 @@ import roro.stellar.manager.util.UserHandleCompat
 import roro.stellar.manager.util.update.ApkDownloader
 import roro.stellar.manager.util.update.AppUpdate
 import roro.stellar.manager.util.update.DownloadState
-import roro.stellar.manager.util.update.UpdateSource
 import roro.stellar.manager.util.update.UpdateUtils
 import java.util.concurrent.TimeUnit
 
@@ -165,7 +164,6 @@ fun SettingsScreen(
     var showAccessibilityHintDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
-    var currentSource by remember { mutableStateOf<UpdateSource?>(null) }
     var isServiceRunning by remember { mutableStateOf(Stellar.pingBinder()) }
     var bootAdbStartAvailable by remember { mutableStateOf<Boolean?>(null) }
 
@@ -201,7 +199,6 @@ fun SettingsScreen(
                 StellarSettings.setBootMode(StellarSettings.BootMode.NONE)
             }
         }
-        currentSource = UpdateUtils.getPreferredSource()
     }
 
     var tcpipPort by remember {
@@ -264,16 +261,15 @@ fun SettingsScreen(
     var isCheckingUpdate by remember { mutableStateOf(false) }
     var pendingUpdate by remember { mutableStateOf<AppUpdate?>(null) }
     var showUpdateDialog by remember { mutableStateOf(false) }
-    var showSourceDialog by remember { mutableStateOf(false) }
     var isDownloading by remember { mutableStateOf(false) }
     var downloadProgress by remember { mutableIntStateOf(0) }
     var downloadError by remember { mutableStateOf<String?>(null) }
 
-    val performCheckUpdate: (UpdateSource?) -> Unit = { source ->
+    val performCheckUpdate: () -> Unit = {
         isCheckingUpdate = true
         scope.launch {
             try {
-                val update = UpdateUtils.checkUpdate(source)
+                val update = UpdateUtils.checkUpdate()
                 if (update != null && update.versionCode > BuildConfig.VERSION_CODE) {
                     pendingUpdate = update
                     showUpdateDialog = true
@@ -753,9 +749,7 @@ fun SettingsScreen(
 
                         UpdateCard(
                             isCheckingUpdate = isCheckingUpdate,
-                            onCheckUpdate = { performCheckUpdate(null) },
-                            onLongClick = { showSourceDialog = true },
-                            currentSource = currentSource,
+                            onCheckUpdate = { performCheckUpdate() },
                             modifier = Modifier.weight(1f).fillMaxHeight()
                         )
                     }
@@ -773,9 +767,7 @@ fun SettingsScreen(
                 item {
                     UpdateCard(
                         isCheckingUpdate = isCheckingUpdate,
-                        onCheckUpdate = { performCheckUpdate(null) },
-                        onLongClick = { showSourceDialog = true },
-                        currentSource = currentSource
+                        onCheckUpdate = { performCheckUpdate() }
                     )
                 }
             }
@@ -934,17 +926,6 @@ fun SettingsScreen(
                         Toast.makeText(context, context.getString(R.string.cannot_open_browser), Toast.LENGTH_SHORT).show()
                     }
                 }
-            }
-        )
-    }
-
-    if (showSourceDialog) {
-        UpdateSourceDialog(
-            onDismiss = { showSourceDialog = false },
-            onSourceSelected = { source ->
-                showSourceDialog = false
-                currentSource = source
-                performCheckUpdate(source)
             }
         )
     }
@@ -1255,8 +1236,6 @@ private fun applyBootMode(
 private fun UpdateCard(
     isCheckingUpdate: Boolean,
     onCheckUpdate: () -> Unit,
-    onLongClick: () -> Unit,
-    currentSource: UpdateSource?,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -1269,11 +1248,6 @@ private fun UpdateCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(AppShape.shapes.cardMedium)
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = onLongClick
-                )
                 .padding(16.dp)
         ) {
             Row(
@@ -1314,19 +1288,6 @@ private fun UpdateCard(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold
                             )
-                            if (currentSource != null) {
-                                Text(
-                                    text = currentSource.displayName,
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onPrimary,
-                                    modifier = Modifier
-                                        .background(
-                                            color = MaterialTheme.colorScheme.primary,
-                                            shape = AppShape.shapes.tag
-                                        )
-                                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                                )
-                            }
                         }
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -1465,57 +1426,6 @@ private fun NewVersionDialog(
                         shape = AppShape.shapes.buttonMedium
                     ) {
                         Text(stringResource(if (downloadError != null) R.string.go_to_download else R.string.install))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun UpdateSourceDialog(
-    onDismiss: () -> Unit,
-    onSourceSelected: (UpdateSource) -> Unit
-) {
-    BasicAlertDialog(onDismissRequest = onDismiss) {
-        Surface(
-            shape = AppShape.shapes.dialog,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            tonalElevation = 6.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(AppSpacing.dialogPadding)
-            ) {
-                Text(
-                    text = stringResource(R.string.select_update_source),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(AppSpacing.sectionSpacing))
-
-                UpdateSource.entries.forEach { source ->
-                    Button(
-                        onClick = { onSourceSelected(source) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        shape = AppShape.shapes.buttonMedium
-                    ) {
-                        Text(source.displayName)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(AppSpacing.dialogPadding))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel))
                     }
                 }
             }

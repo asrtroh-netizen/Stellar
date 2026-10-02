@@ -8,6 +8,7 @@ import com.topjohnwu.superuser.Shell
 import org.json.JSONArray
 import org.json.JSONObject
 import roro.stellar.Stellar
+import roro.stellar.manager.BuildConfig
 import roro.stellar.manager.StellarSettings
 import roro.stellar.manager.compat.ClipboardUtils
 import roro.stellar.manager.receiver.StellarReceiverStarter
@@ -15,6 +16,9 @@ import roro.stellar.manager.startup.command.Starter
 import roro.stellar.manager.startup.worker.AdbStartWorker
 import roro.stellar.manager.ui.theme.ThemeMode
 import roro.stellar.manager.ui.theme.ThemePreferences
+import roro.stellar.manager.util.update.ApkDownloader
+import roro.stellar.manager.util.update.DownloadState
+import roro.stellar.manager.util.update.UpdateUtils
 
 /**
  * 首页动作全部留在 Kotlin。Dart 只拿 JSON 快照。
@@ -109,10 +113,30 @@ class HomeActions(private val context: Context) {
     /** 语言列表还在 Compose 设置里，Flutter 壳先不重建 Activity。 */
     fun setLocale(@Suppress("UNUSED_PARAMETER") tag: String) = Unit
 
-    fun checkUpdate(): JSONObject = JSONObject()
-        .put("ok", true)
-        .put("hasUpdate", false)
-        .put("message", "")
+    suspend fun checkUpdate(): JSONObject {
+        val update = UpdateUtils.checkUpdate()
+            ?: return JSONObject().put("ok", false).put("hasUpdate", false).put("message", "check failed")
+        if (update.versionCode <= BuildConfig.VERSION_CODE || update.downloadUrl.isEmpty()) {
+            return JSONObject().put("ok", true).put("hasUpdate", false).put("message", "already latest")
+        }
+        var installed = false
+        var error: String? = null
+        ApkDownloader.download(context, update.downloadUrl, "stellar_${update.versionName}.apk")
+            .collect { state ->
+                when (state) {
+                    is DownloadState.Success -> {
+                        ApkDownloader.installApk(context, state.file)
+                        installed = true
+                    }
+                    is DownloadState.Error -> error = state.message
+                    is DownloadState.Progress -> Unit
+                }
+            }
+        return JSONObject()
+            .put("ok", installed)
+            .put("hasUpdate", true)
+            .put("message", error ?: update.versionName)
+    }
 
     fun handleStartViaWadb(start: Boolean) {
         if (start) StellarReceiverStarter.start(context, forceStart = true)

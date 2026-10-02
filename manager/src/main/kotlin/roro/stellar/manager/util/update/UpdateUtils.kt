@@ -8,11 +8,6 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
-enum class UpdateSource(val displayName: String) {
-    GITHUB("GitHub"),
-    GITEE("Gitee")
-}
-
 object UpdateUtils {
 
     private const val TAG = "UpdateUtils"
@@ -23,9 +18,7 @@ object UpdateUtils {
         .build()
 
     private const val GITHUB_API_URL =
-        "https://api.github.com/repos/roro2239/Stellar/releases/latest"
-    private const val GITEE_API_URL =
-        "https://gitee.com/api/v5/repos/su-su2239/Stellar/releases/latest"
+        "https://api.github.com/repos/asrtroh-netizen/Stellar/releases/latest"
 
     private fun parseVersionCode(tagName: String): Int {
         val match = Regex("\\((\\d+)\\)").find(tagName)
@@ -36,33 +29,21 @@ object UpdateUtils {
         return tagName.removePrefix("v").replace(Regex("\\(\\d+\\)"), "")
     }
 
-    private fun isInChina(): Boolean {
-        return java.util.Locale.getDefault().country == "CN"
+    suspend fun checkUpdate(): AppUpdate? = withContext(Dispatchers.IO) {
+        fetchUpdate(GITHUB_API_URL)
     }
 
-    suspend fun getPreferredSource(): UpdateSource = withContext(Dispatchers.IO) {
-        if (isInChina()) UpdateSource.GITEE else UpdateSource.GITHUB
-    }
-
-    suspend fun checkUpdate(source: UpdateSource? = null): AppUpdate? = withContext(Dispatchers.IO) {
-        val actualSource = source ?: getPreferredSource()
-        val url = when (actualSource) {
-            UpdateSource.GITHUB -> GITHUB_API_URL
-            UpdateSource.GITEE -> GITEE_API_URL
-        }
-        fetchUpdate(url, actualSource.displayName)
-    }
-
-    private fun fetchUpdate(apiUrl: String, sourceName: String): AppUpdate? {
+    private fun fetchUpdate(apiUrl: String): AppUpdate? {
         try {
-            val requestBuilder = Request.Builder().url(apiUrl).get()
-            if (apiUrl == GITHUB_API_URL) {
-                requestBuilder.header("Accept", "application/vnd.github+json")
-            }
+            val request = Request.Builder()
+                .url(apiUrl)
+                .header("Accept", "application/vnd.github+json")
+                .get()
+                .build()
 
-            val response = client.newCall(requestBuilder.build()).execute()
+            val response = client.newCall(request).execute()
             if (!response.isSuccessful) {
-                Log.e(TAG, "$sourceName 获取更新信息失败，响应码: ${response.code}")
+                Log.e(TAG, "获取更新信息失败，响应码: ${response.code}")
                 return null
             }
 
@@ -86,7 +67,7 @@ object UpdateUtils {
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "$sourceName 检查更新失败: ${e.message}", e)
+            Log.e(TAG, "检查更新失败: ${e.message}", e)
             return null
         }
     }
