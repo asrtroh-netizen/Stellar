@@ -146,6 +146,12 @@ tasks.withType(CompileArtProfileTask.class).configureEach {
 
 configurations.configureEach {
     exclude group: 'androidx.profileinstaller', module: 'profileinstaller'
+    resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == 'androidx.window' && details.requested.name == 'window-java') {
+            details.useVersion('1.2.0')
+            details.because('Flutter embedding requests 1.2.0; 1.5.0 is not in the offline cache')
+        }
+    }
 }
 dependencies {
     implementation managerLibs.bundles.kotlinxCoroutines
@@ -184,4 +190,7 @@ dependencies {
     ksp managerLibs.roomCompiler
     implementation managerLibs.gson
     implementation managerLibs.workRuntimeKtx
+
+    debugImplementation 'roro.stellar.manager_flutter:flutter_debug:1.0'
+    releaseImplementation 'roro.stellar.manager_flutter:flutter_release:1.0'
 }

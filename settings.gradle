@@ -32,6 +32,15 @@ dependencyResolutionManagement {
                 includeGroup("com.github.jeziellago")
             }
         }
+        exclusiveContent {
+            forRepository {
+                maven { url = "${rootDir}/manager_flutter/build/host/outputs/repo" }
+            }
+            filter {
+                includeGroup("roro.stellar.manager_flutter")
+            }
+        }
+        maven { url = "https://storage.googleapis.com/download.flutter.io" }
     }
 
     versionCatalogs {

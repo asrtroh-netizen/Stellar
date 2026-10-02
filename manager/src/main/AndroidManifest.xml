@@ -66,18 +66,29 @@
         tools:remove="android:appComponentFactory"
         tools:targetApi="36">
 
+        <meta-data
+            android:name="flutterEmbedding"
+            android:value="2" />
+
+        <activity
+            android:name=".flutter.FlutterHostActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
+            android:enableOnBackInvokedCallback="false"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme.Splash"
             android:launchMode="singleTask"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-
-            </intent-filter>
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".ui.features.manager.ManagerActivity"
             android:theme="@style/AppTheme" />

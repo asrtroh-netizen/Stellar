@@ -39,6 +39,14 @@ google-services.json
 /.kotlin
 /nul
 
+# Flutter module 生成物
+manager_flutter/.dart_tool/
+manager_flutter/build/
+manager_flutter/.android/
+manager_flutter/.ios/
+manager_flutter/.flutter-plugins-dependencies
+
+
 # Local AI/tooling context
 .project_context/
 .claude/

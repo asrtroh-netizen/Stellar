@@ -73,6 +73,13 @@
 -keepattributes SourceFile,LineNumberTable
 -renamesourcefileattribute SourceFile
 
+# Flutter add-to-app。-repackageclasses 会改掉 io.flutter 和宿主入口。
+-keep class roro.stellar.manager.flutter.FlutterHostActivity { *; }
+-keep class io.flutter.** { *; }
+-keep class io.flutter.plugins.** { *; }
+-dontwarn io.flutter.embedding.**
+-dontwarn io.flutter.plugin.**
+
 # Fix R8 missing classes for androidx.window
 -dontwarn androidx.window.extensions.**
 -dontwarn androidx.window.area.**
