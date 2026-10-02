@@ -92,6 +92,42 @@ android {
     }
 }
 
+// Flutter 引擎把 libflutter.so 发成普通 jar。AGP 会拿去 dex，debug so 直接撑爆堆。
+// 先从运行时配置抽出 so，再把 jar 排除出 dex。
+def flutterAbis = [
+        armeabi_v7a: 'armeabi-v7a',
+        arm64_v8a  : 'arm64-v8a',
+        x86_64     : 'x86_64',
+]
+tasks.register('extractFlutterJni') {
+    def outDir = layout.buildDirectory.dir('flutter-jni')
+    def cache = new File(gradle.gradleUserHomeDir, 'caches/modules-2/files-2.1/io.flutter')
+    inputs.dir(cache).optional()
+    outputs.dir(outDir)
+    doLast {
+        def root = outDir.get().asFile
+        root.deleteDir()
+        flutterAbis.each { artifact, abi ->
+            def moduleDir = new File(cache, "${artifact}_debug")
+            def jar = moduleDir.exists() ? fileTree(moduleDir).matching { include '**/*.jar' }.files.find { true } : null
+            if (jar == null) throw new GradleException("missing Flutter native jar: ${artifact}_debug")
+            copy {
+                from(zipTree(jar)) { include 'lib/**/*.so' }
+                into(new File(root, abi))
+            }
+        }
+    }
+}
+afterEvaluate {
+    android.sourceSets.debug.jniLibs.srcDir(layout.buildDirectory.dir('flutter-jni'))
+    tasks.matching { it.name == 'mergeDebugJniLibFolders' }.configureEach { dependsOn('extractFlutterJni') }
+    configurations.matching { it.name.toLowerCase().contains('debug') }.configureEach {
+        flutterAbis.keySet().each { abi ->
+            exclude group: 'io.flutter', module: "${abi}_debug"
+        }
+    }
+}
+
 autoResConfig {
     generatedClassFullName = "roro.stellar.manager.StellarLocales"
     generateRes = false
